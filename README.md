@@ -14,6 +14,14 @@ QuantumDesk revolutionizes financial analysis by combining real-time market data
 
 QuantumDesk is in **pre-alpha**. The current build renders a responsive Ratatui dashboard with live Bitfinex and Deribit funding snapshots, minute-level HTTP caching, alert scaffolding, and module placeholders for AI, metrics, and configuration. Tune update cadence via `--refresh-ms`, control cache TTL via `--cache-ttl`, and toggle a condensed interface with `--compact`. Follow the milestone breakdown in [ROADMAP.md](ROADMAP.md) as we march toward broader exchange connectivity.
 
+## Demo
+
+### Full Desk
+<img src="data/full-preview.png" alt="QuantumDesk full layout" width="100%" />
+
+### Compact Desk
+<img src="data/compact-preview.png" alt="QuantumDesk compact layout" width="100%" />
+
 ## Core Features
 
 ### 🔄 Multi-Exchange Integration
@@ -66,12 +74,6 @@ cargo run -- --compact
 ```
 
 Press `q` or `Esc` inside the terminal UI to exit the demo.
-
-### Live Previews
-
-| Full Desk | Compact Desk |
-| --- | --- |
-| ![QuantumDesk full layout](data/full-preview.png) | ![QuantumDesk compact layout](data/compact-preview.png) |
 
 ## Architecture
 
