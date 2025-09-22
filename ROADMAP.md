@@ -9,9 +9,10 @@ QuantumDesk aims to become the most capable AI-powered trading terminal. This ro
 - [ ] Funding monitor widgets (spot vs perp, predicted funding, next settlement).
 - [ ] Local alert manager with threshold configuration and terminal notifications.
 - [ ] Config system (TOML + env overrides) for API keys and refresh cadence.
+- [ ] Telescope-style command palette for symbols, panes, and alert/A.I. actions.
 
 ## 0.2.0 – Intelligence Layer
-- [ ] MCP-compatible AI orchestrator for delegated analysis.
+- [ ] MCP-compatible AI orchestrator for delegated analysis and plug-in agents.
 - [ ] LLM-based alert explanations and strategy suggestions.
 - [ ] Funding prediction models (gradient boosting + venue-specific adjustments).
 - [ ] IBIT/FBTC ETF normalization vs BTC index price.

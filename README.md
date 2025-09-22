@@ -8,11 +8,11 @@
 
 ## Vision
 
-QuantumDesk revolutionizes financial analysis by combining real-time market data, AI-powered insights, and a beautiful terminal interface. Whether you're tracking crypto perpetuals, traditional futures, or ETF premiums, QuantumDesk provides the intelligence layer that transforms raw market data into actionable insights.
+QuantumDesk revolutionizes financial analysis by combining real-time market data, AI-powered insights, and a beautiful terminal interface. Whether you're tracking crypto perpetuals, traditional futures, or ETF premiums, QuantumDesk provides the intelligence layer that transforms raw market data into actionable insights—with an MCP-driven agent backbone and a Telescope-style command palette for instant context switching across markets, alerts, and AI playbooks.
 
 ## Status
 
-QuantumDesk is in **pre-alpha**. The current build renders a responsive Ratatui dashboard with simulated Bitfinex and Deribit funding data, alert scaffolding, and module placeholders for AI, metrics, and configuration. Follow the milestone breakdown in [ROADMAP.md](ROADMAP.md) as we march toward live exchange connectivity.
+QuantumDesk is in **pre-alpha**. The current build renders a responsive Ratatui dashboard with live Bitfinex and Deribit funding snapshots, minute-level HTTP caching, alert scaffolding, and module placeholders for AI, metrics, and configuration. Tune update cadence via `--refresh-ms`, control cache TTL via `--cache-ttl`, and toggle a condensed interface with `--compact`. Follow the milestone breakdown in [ROADMAP.md](ROADMAP.md) as we march toward broader exchange connectivity.
 
 ## Core Features
 
@@ -43,6 +43,7 @@ QuantumDesk is in **pre-alpha**. The current build renders a responsive Ratatui 
 - **Responsive Design**: Auto-adapting layouts for any screen size
 - **Real-time Charts**: Funding curves, price movements, correlations
 - **Customizable Dashboards**: User-defined panel arrangements
+- **Command Palette**: Telescope-inspired fuzzy launcher for panes, feeds, and AI actions (planned)
 - **Dark/Light Themes**: Eye-friendly for extended use
 
 ## Quick Start
@@ -56,9 +57,21 @@ cargo run
 # Or install globally
 cargo install quantumdesk
 quantumdesk
+
+# Custom refresh / cache settings
+cargo run -- --refresh-ms 2000 --cache-ttl 90
+
+# Compact layout
+cargo run -- --compact
 ```
 
 Press `q` or `Esc` inside the terminal UI to exit the demo.
+
+### Live Previews
+
+| Full Desk | Compact Desk |
+| --- | --- |
+| ![QuantumDesk full layout](data/full-preview.png) | ![QuantumDesk compact layout](data/compact-preview.png) |
 
 ## Architecture
 
@@ -103,10 +116,11 @@ Detailed milestone tracking lives in [ROADMAP.md](ROADMAP.md).
 - [ ] Basic funding rate monitoring
 - [ ] Simple alert system
 - [ ] Configuration management
+- [ ] Telescope-style command palette for panes, symbols, and commands
 
 ### Phase 2: Intelligence (Months 2-3)
 - [ ] Claude/OpenAI integration
-- [ ] MCP protocol implementation
+- [ ] MCP protocol implementation with pluggable analysts
 - [ ] Predictive funding models
 - [ ] Advanced charting capabilities
 - [ ] Historical data storage

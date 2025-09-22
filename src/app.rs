@@ -4,10 +4,9 @@ use chrono::{Duration, Utc};
 use crate::ai::AiOrchestrator;
 use crate::alerts::{AlertManager, AlertStatus};
 use crate::config::AppConfig;
-use crate::data::{DataHub, MarketSnapshot};
+use crate::data::{CollectionOutcome, DataHub, MarketSnapshot};
 use crate::metrics::{MetricsEngine, MetricsSummary};
 
-#[derive(Debug)]
 pub struct QuantumDesk {
     pub state: AppState,
     config: AppConfig,
@@ -32,39 +31,29 @@ impl QuantumDesk {
 
         let market_snapshots = vec![
             MarketSnapshot::placeholder(
-                "Bitfinex",
-                "tBTCUSD",
-                65_420.12,
-                None,
-                0.0003,
-                0.00045,
-                Some(Utc::now() + Duration::minutes(50)),
+                "Bitfinex", "Spot", "tBTCUSD", 65_420.12, None, 0.0, None, None,
             ),
             MarketSnapshot::placeholder(
                 "Bitfinex",
+                "Perp",
                 "tBTCF0:USTF0",
                 65_410.25,
                 Some(65_430.50),
                 0.00065,
-                0.00072,
+                Some(0.00072),
                 Some(Utc::now() + Duration::minutes(50)),
             ),
             MarketSnapshot::placeholder(
-                "Deribit",
-                "BTC-USD",
-                65_398.00,
-                None,
-                0.00028,
-                0.00031,
-                Some(Utc::now() + Duration::minutes(42)),
+                "Deribit", "Index", "BTC-USD", 65_398.00, None, 0.0, None, None,
             ),
             MarketSnapshot::placeholder(
                 "Deribit",
+                "Perp",
                 "BTC-PERPETUAL",
                 65_402.89,
                 Some(65_420.11),
                 0.00052,
-                0.0006,
+                Some(0.0006),
                 Some(Utc::now() + Duration::minutes(42)),
             ),
         ];
@@ -92,21 +81,81 @@ impl QuantumDesk {
     }
 
     pub fn tick(&mut self) -> Result<()> {
+        let CollectionOutcome {
+            snapshots,
+            warnings,
+        } = self.data_hub.collect(&self.config);
+
+        if !snapshots.is_empty() {
+            self.state.market_snapshots = snapshots;
+        }
+        self.state.warnings = warnings;
         self.state.metrics_summary = self.metrics.summarize(&self.state.market_snapshots);
         self.state.alerts = self.alerts.alerts.clone();
         self.refresh_status_line();
         Ok(())
     }
 
-    fn refresh_status_line(&mut self) {
-        self.state.status_line = format!(
-            "QuantumDesk • Refresh {}ms • Feed: {} • AI: {} • Triggered alerts: {}",
-            self.config.update_interval_ms,
-            self.data_hub.status(),
-            self.ai.readiness_label(),
-            self.alerts.triggered_count()
-        );
+    pub fn refresh_interval_ms(&self) -> u64 {
+        self.config.update_interval_ms
     }
+
+    pub fn is_compact(&self) -> bool {
+        self.config.compact_mode
+    }
+
+    fn refresh_status_line(&mut self) {
+        let mut parts = vec![
+            format!(
+                "Mode {}",
+                if self.is_compact() { "compact" } else { "full" }
+            ),
+            format!("Refresh {}ms", self.config.update_interval_ms),
+            format!("Cache {}s", self.config.cache_ttl_secs),
+            format!("Feed {}", self.data_hub.status()),
+            format!("AI {}", self.ai.readiness_label()),
+            format!("Alerts {}", self.alerts.triggered_count()),
+        ];
+
+        if let Some(warning) = summarize_warnings(&self.state.warnings) {
+            parts.push(warning);
+        } else {
+            parts.push("Feeds healthy".into());
+        }
+
+        self.state.status_line = parts.join(" | ");
+    }
+}
+
+fn summarize_warnings(warnings: &[String]) -> Option<String> {
+    if warnings.is_empty() {
+        return None;
+    }
+
+    let count = warnings.len();
+    let suffix = if count > 1 { "warnings" } else { "warning" };
+    let preview = warnings
+        .first()
+        .map(|warning| truncate_for_status(warning))
+        .unwrap_or_default();
+    Some(format!("{} {}: {}", count, suffix, preview))
+}
+
+fn truncate_for_status(text: &str) -> String {
+    const MAX_LEN: usize = 80;
+    if text.len() <= MAX_LEN {
+        return text.to_string();
+    }
+
+    let mut truncated = String::with_capacity(MAX_LEN + 1);
+    for (idx, ch) in text.chars().enumerate() {
+        if idx >= MAX_LEN {
+            truncated.push('…');
+            break;
+        }
+        truncated.push(ch);
+    }
+    truncated
 }
 
 #[derive(Debug, Clone)]
@@ -114,6 +163,7 @@ pub struct AppState {
     pub market_snapshots: Vec<MarketSnapshot>,
     pub metrics_summary: MetricsSummary,
     pub alerts: Vec<AlertStatus>,
+    pub warnings: Vec<String>,
     pub status_line: String,
 }
 
@@ -123,6 +173,7 @@ impl AppState {
             market_snapshots: snapshots,
             metrics_summary: MetricsSummary::default(),
             alerts,
+            warnings: Vec::new(),
             status_line: "QuantumDesk • Press 'q' to quit".into(),
         }
     }
