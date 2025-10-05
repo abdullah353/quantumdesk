@@ -58,7 +58,7 @@ QuantumDesk is in **pre-alpha**. The current build renders a responsive Ratatui 
 
 ```bash
 # Clone and run
-git clone https://github.com/yourusername/quantumdesk
+git clone https://github.com/abdullah353/quantumdesk
 cd quantumdesk
 cargo run
 
@@ -147,7 +147,7 @@ We welcome contributions from traders, developers, and financial enthusiasts!
 
 ### Getting Started
 1. Check our [Contributing Guide](CONTRIBUTING.md)
-2. Browse [Good First Issues](https://github.com/yourusername/quantumdesk/labels/good%20first%20issue)
+2. Browse [Good First Issues](https://github.com/abdullah353/quantumdesk/labels/good%20first%20issue)
 3. Join our [Discord Community](https://discord.gg/quantumdesk)
 
 ### Development Setup
@@ -156,7 +156,7 @@ We welcome contributions from traders, developers, and financial enthusiasts!
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Clone and setup
-git clone https://github.com/yourusername/quantumdesk
+git clone https://github.com/abdullah353/quantumdesk
 cd quantumdesk
 cargo build
 cargo test
